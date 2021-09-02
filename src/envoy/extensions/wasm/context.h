@@ -20,17 +20,7 @@ namespace Common {
 namespace Wasm {
 namespace Istio {
 
-class IstioContext : public Context {
- public:
-  IstioContext() : Context() {}
-  IstioContext(Wasm* wasm) : Context(wasm) {}
-  IstioContext(Wasm* wasm, const PluginSharedPtr& plugin)
-      : Context(wasm, plugin) {}
-  IstioContext(Wasm* wasm, uint32_t root_context_id,
-               const PluginSharedPtr& plugin)
-      : Context(wasm, root_context_id, plugin) {}
-  ~IstioContext() = default;
-};
+
 }  // namespace Istio
 }  // namespace Wasm
 }  // namespace Common

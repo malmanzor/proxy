@@ -19,6 +19,7 @@
 #include "absl/strings/str_split.h"
 #include "extensions/common/node_info_bfbs_generated.h"
 #include "extensions/common/util.h"
+#include "flatbuffers/util.h"
 
 // WASM_PROLOG
 #ifndef NULL_PLUGIN
@@ -261,9 +262,9 @@ flatbuffers::DetachedBuffer extractLocalNodeFlatBuffer() {
     }
   }
   if (getValue({"node", "metadata", "APP_CONTAINERS"}, &value)) {
-    std::vector<std::string_view> containers = absl::StrSplit(value, ',');
+    std::vector<absl::string_view> containers = absl::StrSplit(value, ',');
     for (const auto& container : containers) {
-      app_containers.push_back(fbb.CreateString(container));
+      app_containers.push_back(fbb.CreateString(toStdStringView(container)));
     }
   }
 
@@ -295,7 +296,7 @@ bool extractPeerMetadataFromUpstreamHostMetadata(
           &endpoint_labels)) {
     return false;
   }
-  std::vector<std::string_view> parts = absl::StrSplit(endpoint_labels, ';');
+  std::vector<absl::string_view> parts = absl::StrSplit(endpoint_labels, ';');
   // workload label should semicolon separated four parts string:
   // workload_name;namespace;canonical_service;canonical_revision.
   if (parts.size() < 4) {
@@ -304,17 +305,17 @@ bool extractPeerMetadataFromUpstreamHostMetadata(
 
   flatbuffers::Offset<flatbuffers::String> workload_name, namespace_;
   std::vector<flatbuffers::Offset<KeyVal>> labels;
-  workload_name = fbb.CreateString(parts[0]);
-  namespace_ = fbb.CreateString(parts[1]);
+  workload_name = fbb.CreateString(toStdStringView(parts[0]));
+  namespace_ = fbb.CreateString(toStdStringView(parts[1]));
   if (!parts[2].empty()) {
     labels.push_back(CreateKeyVal(fbb,
                                   fbb.CreateString(kCanonicalServiceLabelName),
-                                  fbb.CreateString(parts[2])));
+                                  fbb.CreateString(toStdStringView(parts[2]))));
   }
   if (!parts[3].empty()) {
     labels.push_back(
         CreateKeyVal(fbb, fbb.CreateString(kCanonicalServiceRevisionLabelName),
-                     fbb.CreateString(parts[3])));
+                     fbb.CreateString(toStdStringView(parts[3]))));
   }
   auto labels_offset = fbb.CreateVectorOfSortedTables(&labels);
 
@@ -482,7 +483,7 @@ bool populateGRPCInfo(RequestInfo* request_info) {
   }
   // The expected byte serialization of grpc_stats filter is "x,y" where "x"
   // is the request message count and "y" is the response message count.
-  std::vector<std::string_view> parts = absl::StrSplit(value, ',');
+  std::vector<absl::string_view> parts = absl::StrSplit(value, ',');
   if (parts.size() == 2) {
     return absl::SimpleAtoi(parts[0], &request_info->request_message_count) &&
            absl::SimpleAtoi(parts[1], &request_info->response_message_count);

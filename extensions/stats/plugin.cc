@@ -469,7 +469,7 @@ bool PluginRootContext::configure(size_t configuration_size) {
   auto result = ::Wasm::Common::JsonParse(configuration_data->view());
   if (!result.has_value()) {
     LOG_WARN(absl::StrCat("cannot parse plugin configuration JSON string: ",
-                          configuration_data->view()));
+                          ::Wasm::Common::toAbslStringView(configuration_data->view())));
     return false;
   }
 
@@ -628,7 +628,7 @@ void PluginRootContext::report(::Wasm::Common::RequestInfo& request_info,
       continue;
     }
     auto stat = statgen.resolve(istio_dimensions_);
-    LOG_DEBUG(absl::StrCat("metricKey cache miss ", statgen.name(), " ",
+    LOG_DEBUG(absl::StrCat("metricKey cache miss ", ::Wasm::Common::toAbslStringView(statgen.name()), " ",
                            ", stat=", stat.metric_id_,
                            ", recurrent=", stat.recurrent_));
     if (end_stream || stat.recurrent_) {

@@ -101,7 +101,7 @@ bool PluginRootContext::onConfigure(size_t configuration_size) {
   json_options.ignore_unknown_fields = true;
   istio::attributegen::PluginConfig config;
   Status status = JsonStringToMessage(configuration, &config, json_options);
-  if (status != Status::OK) {
+  if (!status.ok()) {
     LOG_WARN(
         absl::StrCat("Config Error: cannot parse 'attributegen' plugin "
                      "configuration JSON string [YAML is "

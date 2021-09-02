@@ -47,6 +47,8 @@ envoy_cc_library(
         "//src/envoy/utils:utils_lib",
         "//src/istio/authn:context_proto_cc_proto",
         "@envoy//source/common/http:headers_lib",
+        "@envoy//source/extensions/filters/http:well_known_names",
+        "//extensions/common:json_util",
     ],
 )
 

@@ -5,10 +5,10 @@ load(
     "envoy_cc_library",
     "envoy_package",
 )
-load(
-    "@envoy//bazel/wasm:wasm.bzl",
-    "wasm_cc_binary",
-)
+#load(
+#    "@envoy//bazel/wasm:wasm.bzl",
+#    "wasm_cc_binary",
+#)
 
 envoy_package()
 
@@ -27,6 +27,7 @@ envoy_cc_library(
         "//extensions/common:context",
         "//extensions/common:json_util",
         "//extensions/common:proto_util",
+        "//extensions/common:util",
         "@envoy//source/common/common:base64_lib",
         "@envoy//source/extensions/common/wasm/ext:declare_property_cc_proto",
         "@proxy_wasm_cpp_host//:lib",

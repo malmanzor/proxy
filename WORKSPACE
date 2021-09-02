@@ -43,7 +43,7 @@ ENVOY_SHA = "1bd26913e86a1e5fdc034cf2a778b6a50ffb3010"
 
 ENVOY_SHA256 = "48a54cb50ddf8b5df0deb0541c63a63712f0d5fe6111efd5e201737bd29804f2"
 
-ENVOY_ORG = "istio"
+ENVOY_ORG = "malmanzor"
 
 ENVOY_REPO = "envoy"
 
@@ -102,13 +102,13 @@ load(
 
 container_repositories()
 
-load("@io_bazel_rules_docker//repositories:deps.bzl", container_deps = "deps")
+#load("@io_bazel_rules_docker//repositories:deps.bzl", container_deps = "deps")
 
-container_deps()
+#container_deps()
 
-load("@io_bazel_rules_docker//repositories:pip_repositories.bzl", "pip_deps")
+#load("@io_bazel_rules_docker//repositories:pip_repositories.bzl", "pip_deps")
 
-pip_deps()
+#pip_deps()
 
 load(
     "@io_bazel_rules_docker//container:container.bzl",

@@ -15,7 +15,7 @@
 
 #include "src/envoy/http/alpn/alpn_filter.h"
 
-#include "common/network/application_protocol.h"
+#include "source/common/network/application_protocol.h"
 #include "envoy/upstream/cluster_manager.h"
 
 namespace Envoy {
@@ -67,15 +67,15 @@ Http::FilterHeadersStatus AlpnFilter::decodeHeaders(Http::RequestHeaderMap &,
   }
 
   Upstream::ThreadLocalCluster *cluster =
-      config_->clusterManager().get(route_entry->clusterName());
+      config_->clusterManager().getThreadLocalCluster(route_entry->clusterName());
   if (!cluster || !cluster->info()) {
     ENVOY_LOG(debug, "cannot find cluster {}", route_entry->clusterName());
     return Http::FilterHeadersStatus::Continue;
   }
 
-  Http::Protocol protocol = cluster->info()->upstreamHttpProtocol(
+  auto protocols = cluster->info()->upstreamHttpProtocol(
       decoder_callbacks_->streamInfo().protocol());
-  const auto &alpn_override = config_->alpnOverrides(protocol);
+  const auto &alpn_override = config_->alpnOverrides(protocols[0]);
 
   if (!alpn_override.empty()) {
     ENVOY_LOG(debug, "override with {} ALPNs", alpn_override.size());

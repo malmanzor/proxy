@@ -21,8 +21,8 @@
 #include "absl/base/internal/endian.h"
 #include "absl/strings/str_split.h"
 #include "absl/strings/string_view.h"
-#include "common/buffer/buffer_impl.h"
-#include "common/protobuf/utility.h"
+#include "source/common/buffer/buffer_impl.h"
+#include "source/common/protobuf/utility.h"
 #include "envoy/network/connection.h"
 #include "envoy/stats/scope.h"
 #include "src/envoy/tcp/metadata_exchange/metadata_exchange_initial_header.h"
@@ -275,9 +275,9 @@ void MetadataExchangeFilter::tryReadProxyData(Buffer::Instance& data) {
       value_struct.fields().find(ExchangeMetadataHeaderId);
   if (key_metadata_id_it != value_struct.fields().end()) {
     Envoy::ProtobufWkt::Value val = key_metadata_id_it->second;
-    updatePeerId(config_->filter_direction_ == FilterDirection::Downstream
+    updatePeerId(toAbslStringView(config_->filter_direction_ == FilterDirection::Downstream
                      ? ::Wasm::Common::kDownstreamMetadataIdKey
-                     : ::Wasm::Common::kUpstreamMetadataIdKey,
+                     : ::Wasm::Common::kUpstreamMetadataIdKey),
                  val.string_value());
   }
 }
@@ -288,7 +288,7 @@ void MetadataExchangeFilter::updatePeer(
 
   // Filter object captures schema by view, hence the global singleton for the
   // prototype.
-  auto state = std::make_unique<::Envoy::Extensions::Common::Wasm::WasmState>(
+  auto state = std::make_unique<::Envoy::Extensions::Filters::Common::Expr::CelState>(
       MetadataExchangeConfig::nodeInfoPrototype());
   state->setValue(
       absl::string_view(reinterpret_cast<const char*>(fb.data()), fb.size()));
@@ -297,19 +297,19 @@ void MetadataExchangeFilter::updatePeer(
                  ? ::Wasm::Common::kDownstreamMetadataKey
                  : ::Wasm::Common::kUpstreamMetadataKey;
   read_callbacks_->connection().streamInfo().filterState()->setData(
-      absl::StrCat("wasm.", key), std::move(state),
+      absl::StrCat("wasm.", Wasm::Common::toAbslStringView(key)), std::move(state),
       StreamInfo::FilterState::StateType::Mutable,
       StreamInfo::FilterState::LifeSpan::Connection);
 }
 
 void MetadataExchangeFilter::updatePeerId(absl::string_view key,
                                           absl::string_view value) {
-  WasmStatePrototype prototype(
+  CelStatePrototype prototype(
       /* read_only = */ false,
-      ::Envoy::Extensions::Common::Wasm::WasmType::String, absl::string_view(),
+      ::Envoy::Extensions::Filters::Common::Expr::CelStateType::String, absl::string_view(),
       StreamInfo::FilterState::LifeSpan::Connection);
   auto state =
-      std::make_unique<::Envoy::Extensions::Common::Wasm::WasmState>(prototype);
+      std::make_unique<::Envoy::Extensions::Filters::Common::Expr::CelState>(prototype);
   state->setValue(value);
   read_callbacks_->connection().streamInfo().filterState()->setData(
       absl::StrCat("wasm.", key), std::move(state),
@@ -333,7 +333,7 @@ void MetadataExchangeFilter::setMetadataNotFoundFilterState() {
   auto key = config_->filter_direction_ == FilterDirection::Downstream
                  ? ::Wasm::Common::kDownstreamMetadataIdKey
                  : ::Wasm::Common::kUpstreamMetadataIdKey;
-  updatePeerId(key, ::Wasm::Common::kMetadataNotFoundValue);
+  updatePeerId(toAbslStringView(key), ::Wasm::Common::kMetadataNotFoundValue);
 }
 
 }  // namespace MetadataExchange

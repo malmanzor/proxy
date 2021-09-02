@@ -33,14 +33,16 @@ ROOT=/go/src
 # Configure available resources and disable IPv6 tests.
 export BAZEL_BUILD_ARGS="--local_ram_resources=12288 --local_cpu_resources=8 --verbose_failures --test_env=ENVOY_IP_TEST_VERSIONS=v4only --test_output=errors"
 
+BAZEL_BUILD_ARGS="${BAZEL_BUILD_ARGS} --override_repository=envoy=/workspace/oss/envoyzzz"
+
 # Override envoy.
-if [[ "${ENVOY_REPOSITORY:-}" && "${ENVOY_PREFIX:-}" ]]; then
-  TMP_DIR=$(mktemp -d -t envoy-XXXXXXXXXX)
-  trap 'rm -rf ${TMP_DIR:?}' EXIT
-  ENVOY_SHA="${ENVOY_SHA:-$(grep -Pom1 "^ENVOY_SHA = \"\K[a-zA-Z0-9]{40}" "$WORKSPACE")}"
-  BAZEL_BUILD_ARGS="${BAZEL_BUILD_ARGS} --override_repository=envoy=${TMP_DIR}/${ENVOY_PREFIX}-${ENVOY_SHA}"
-  curl -nsSfL "${ENVOY_REPOSITORY}/archive/${ENVOY_SHA}.tar.gz" | tar -C "${TMP_DIR}" -xz
-fi
+#if [[ "${ENVOY_REPOSITORY:-}" && "${ENVOY_PREFIX:-}" ]]; then
+#  TMP_DIR=$(mktemp -d -t envoy-XXXXXXXXXX)
+#  trap 'rm -rf ${TMP_DIR:?}' EXIT
+#  ENVOY_SHA="${ENVOY_SHA:-$(grep -Pom1 "^ENVOY_SHA = \"\K[a-zA-Z0-9]{40}" "$WORKSPACE")}"
+#  BAZEL_BUILD_ARGS="${BAZEL_BUILD_ARGS} --override_repository=envoy=${TMP_DIR}/${ENVOY_PREFIX}-${ENVOY_SHA}"
+#  curl -nsSfL "${ENVOY_REPOSITORY}/archive/${ENVOY_SHA}.tar.gz" | tar -C "${TMP_DIR}" -xz
+#fi
 
 # e2e tests under //test/envoye2e/... use Bazel artifacts.
 # shellcheck disable=SC2086

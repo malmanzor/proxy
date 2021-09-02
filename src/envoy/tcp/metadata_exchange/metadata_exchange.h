@@ -17,7 +17,7 @@
 
 #include <string>
 
-#include "common/protobuf/protobuf.h"
+#include "source/common/protobuf/protobuf.h"
 #include "envoy/local_info/local_info.h"
 #include "envoy/network/filter.h"
 #include "envoy/runtime/runtime.h"
@@ -27,14 +27,15 @@
 #include "extensions/common/context.h"
 #include "extensions/common/node_info_bfbs_generated.h"
 #include "extensions/common/proto_util.h"
-#include "extensions/common/wasm/wasm_state.h"
+#include "source/extensions/filters/common/expr/cel_state.h"
 #include "src/envoy/tcp/metadata_exchange/config/metadata_exchange.pb.h"
+#include "extensions/common/util.h"
 
 namespace Envoy {
 namespace Tcp {
 namespace MetadataExchange {
 
-using ::Envoy::Extensions::Common::Wasm::WasmStatePrototype;
+using ::Envoy::Extensions::Filters::Common::Expr::CelStatePrototype;
 
 /**
  * All MetadataExchange filter stats. @see stats_macros.h
@@ -82,10 +83,10 @@ class MetadataExchangeConfig {
   // Stats for MetadataExchange Filter.
   MetadataExchangeStats stats_;
 
-  static const WasmStatePrototype& nodeInfoPrototype() {
-    static const WasmStatePrototype* const prototype = new WasmStatePrototype(
-        true, ::Envoy::Extensions::Common::Wasm::WasmType::FlatBuffers,
-        ::Wasm::Common::nodeInfoSchema(),
+  static const CelStatePrototype& nodeInfoPrototype() {
+    static const CelStatePrototype* const prototype = new CelStatePrototype(
+        true,  ::Envoy::Extensions::Filters::Common::Expr::CelStateType::FlatBuffers,
+        Wasm::Common::toAbslStringView(::Wasm::Common::nodeInfoSchema()),
         StreamInfo::FilterState::LifeSpan::Connection);
     return *prototype;
   }

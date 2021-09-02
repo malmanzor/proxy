@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#include "common/common/base64.h"
-#include "common/common/utility.h"
-#include "extensions/filters/http/well_known_names.h"
+#include "source/common/common/base64.h"
+#include "source/common/common/utility.h"
+#include "source/extensions/filters/http/well_known_names.h"
 #include "fmt/printf.h"
 #include "src/envoy/utils/filter_names.h"
 #include "src/istio/authn/context.pb.h"

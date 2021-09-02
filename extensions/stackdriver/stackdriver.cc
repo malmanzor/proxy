@@ -22,6 +22,7 @@
 #include <unordered_map>
 
 #include "extensions/common/proto_util.h"
+#include "extensions/common/util.h"
 #include "extensions/stackdriver/edges/mesh_edges_service_client.h"
 #include "extensions/stackdriver/log/exporter.h"
 #include "extensions/stackdriver/metric/registry.h"
@@ -222,7 +223,7 @@ bool StackdriverRootContext::configure(size_t configuration_size) {
   JsonParseOptions json_options;
   json_options.ignore_unknown_fields = true;
   Status status = JsonStringToMessage(configuration, &config_, json_options);
-  if (status != Status::OK) {
+  if (!status.ok()) {
     logWarn("Cannot parse Stackdriver plugin configuration JSON string " +
             configuration + ", " + status.message().ToString());
     return false;
@@ -465,16 +466,6 @@ void StackdriverRootContext::record() {
                          true /* audit */);
   }
 
-  if (enableEdgeReporting()) {
-    if (!peer_node_info.found()) {
-      LOG_DEBUG(absl::StrCat(
-          "cannot get metadata for: ", ::Wasm::Common::kDownstreamMetadataIdKey,
-          "; skipping edge."));
-      return;
-    }
-    edge_reporter_->addEdge(request_info, peer_node_info.id(),
-                            peer_node_info.get());
-  }
 }
 
 bool StackdriverRootContext::recordTCP(uint32_t id) {

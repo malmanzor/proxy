@@ -310,6 +310,10 @@ build:clang-cl --copt="-Wno-macro-redefined"
 build:clang-cl --copt="-Wno-builtin-macro-redefined"
 build:clang-cl --action_env=USE_CLANG_CL=1
 
+#custom
+build:clang-cl --copt="-Wno-deprecated-declarations"
+build --copt="-Wno-deprecated-declarations"
+
 # Defaults to 'auto' - Off for windows, so override to linux behavior
 build:windows --enable_runfiles=yes
 
